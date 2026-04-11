@@ -1,6 +1,6 @@
 /**
  * ============================================================
- * NEXUS CHAT v2 — Server (FIXED)
+ * NEXUS CHAT v2 — SERVER (FINAL PRODUCTION)
  * ============================================================
  */
 
@@ -19,17 +19,19 @@ const { handleConnection } = require('./sockets/chatSocket');
 const app    = express();
 const server = http.createServer(app);
 
+// ── Socket.IO ────────────────────────────────────────────────
 const io = socketIo(server, {
   cors: {
-    origin: '*'
+    origin: '*',
+    methods: ['GET', 'POST']
   }
 });
 
-// ── Middleware ────────────────────────────────────────────────
+// ── Middleware ───────────────────────────────────────────────
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── MongoDB (FIXED) ───────────────────────────────────────────
+// ── MongoDB ──────────────────────────────────────────────────
 const MONGO_URI = process.env.MONGODB_URI;
 
 if (!MONGO_URI) {
@@ -44,8 +46,9 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
-// ── REST API ──────────────────────────────────────────────────
+// ── REST API ─────────────────────────────────────────────────
 
+// Generate username
 app.post('/api/username', async (req, res) => {
   try {
     const username = await generateUniqueUsername();
@@ -55,13 +58,17 @@ app.post('/api/username', async (req, res) => {
   }
 });
 
+// Create room
 app.post('/api/rooms', async (req, res) => {
   const { name, password, createdBy } = req.body;
 
   if (!name || !password || !createdBy)
     return res.status(400).json({ error: 'Missing fields' });
 
-  const safeName = name.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '').slice(0, 32);
+  const safeName = name.trim().toLowerCase()
+    .replace(/[^a-z0-9-_]/g, '')
+    .slice(0, 32);
+
   if (!safeName)
     return res.status(400).json({ error: 'Invalid room name' });
 
@@ -76,6 +83,7 @@ app.post('/api/rooms', async (req, res) => {
   }
 });
 
+// Join room
 app.post('/api/rooms/join', async (req, res) => {
   const { name, password } = req.body;
 
@@ -96,6 +104,7 @@ app.post('/api/rooms/join', async (req, res) => {
   }
 });
 
+// Room info
 app.get('/api/rooms/:name/info', async (req, res) => {
   try {
     const info = await getRoomInfo(req.params.name.toLowerCase());
@@ -113,18 +122,20 @@ app.get('/api/rooms/:name/info', async (req, res) => {
   }
 });
 
-// ── Socket ────────────────────────────────────────────────────
+// ── Socket ───────────────────────────────────────────────────
 io.on('connection', (socket) => handleConnection(io, socket));
 
-// ── Cleanup job ───────────────────────────────────────────────
+// ── Cleanup Job ──────────────────────────────────────────────
 setInterval(async () => {
   try {
     const n = await cleanupOrphanMessages();
     if (n > 0) console.log(`🧹 Cleaned ${n} orphan messages`);
-  } catch {}
+  } catch (err) {
+    console.log('Cleanup error:', err.message);
+  }
 }, 60 * 60 * 1000);
 
-// ── Start Server ──────────────────────────────────────────────
+// ── Start Server ─────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
