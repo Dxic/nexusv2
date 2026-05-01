@@ -1,187 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <title>Nexus Chat</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600&display=swap"/>
-  <link rel="stylesheet" href="style.css"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Nexus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
-<div id="screen-identity" class="screen active">
-  <div class="screen-card">
-    <div class="brand">
-      <div class="brand-hex">⬡</div>
-      <div class="brand-name">NEXUS</div>
-      <div class="brand-tag">ephemeral · private · anonymous</div>
+<div id="s-identity" class="screen active">
+  <div class="auth-wrap">
+    <div class="auth-logo"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><polygon points="18,2 34,11 34,25 18,34 2,25 2,11" stroke="#4f8ef7" stroke-width="2" fill="none"/><polygon points="18,8 28,14 28,22 18,28 8,22 8,14" stroke="#4f8ef7" stroke-width="1" fill="rgba(79,142,247,0.08)"/></svg><span class="logo-name">nexus</span></div>
+    <h2 class="auth-title">Identitas kamu</h2>
+    <p class="auth-sub">Di-generate sekali, permanen untuk sesi ini</p>
+    <div class="identity-box">
+      <div class="id-label">USERNAME</div>
+      <div class="id-value" id="identity-display"><span class="shimmer-text">generating...</span></div>
     </div>
-    <div class="identity-card">
-      <p class="identity-label">IDENTITAS KAMU</p>
-      <div class="identity-name" id="identity-display"><span class="id-shimmer">generating…</span></div>
-      <p class="identity-note">Identitas ini hanya milikmu — tidak bisa dipakai orang lain.</p>
-      <button class="btn-primary" id="btn-identity-continue">Lanjutkan →</button>
-    </div>
-    <p class="privacy-note">🔒 Pesan hanya disimpan untuk keperluan chat. Tidak dibagikan ke pihak ketiga.</p>
+    <button class="btn-main" id="btn-identity-continue">Lanjut →</button>
+    <p class="privacy-note">🔒 Pesan hanya disimpan untuk chat. Tidak dibagikan ke siapapun.</p>
   </div>
 </div>
 
-<div id="screen-lobby" class="screen">
-  <div class="screen-card wide">
-    <div class="lobby-header">
-      <div class="brand-small">⬡ <span>NEXUS</span></div>
-      <div class="user-chip"><span class="dot-green"></span><span id="lobby-username"></span></div>
+<div id="s-lobby" class="screen">
+  <div class="auth-wrap wide">
+    <div class="lobby-top">
+      <div class="auth-logo sm"><svg width="22" height="22" viewBox="0 0 36 36" fill="none"><polygon points="18,2 34,11 34,25 18,34 2,25 2,11" stroke="#4f8ef7" stroke-width="2.5" fill="none"/></svg><span class="logo-name">nexus</span></div>
+      <div class="user-badge"><span class="u-dot"></span><span id="lobby-uname"></span></div>
     </div>
-    <div class="lobby-tabs">
-      <button class="tab active" data-tab="join">Gabung Room</button>
-      <button class="tab" data-tab="create">Buat Room</button>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="join">Gabung Room</button>
+      <button class="tab-btn" data-tab="create">Buat Room</button>
     </div>
-    <div class="tab-panel active" id="tab-join">
-      <div class="field-group">
-        <label>Nama Room</label>
-        <input id="join-room-name" type="text" placeholder="contoh: study-group" maxlength="32" autocomplete="off"/>
-        <div id="join-room-status" class="room-status"></div>
-      </div>
-      <div class="field-group">
-        <label>Password</label>
-        <div class="pw-wrap">
-          <input id="join-password" type="password" placeholder="••••••••" autocomplete="off"/>
-          <button class="pw-toggle" data-target="join-password">👁</button>
-        </div>
-      </div>
-      <button class="btn-primary" id="btn-join">Masuk Room →</button>
-      <div id="join-error" class="error-msg"></div>
+    <div class="tab-pane active" id="tp-join">
+      <div class="field"><label>Nama Room</label><input id="join-name" type="text" placeholder="contoh: study-group" maxlength="32" autocomplete="off"/><div id="join-room-hint" class="field-hint"></div></div>
+      <div class="field"><label>Password</label><div class="pw-row"><input id="join-pw" type="password" placeholder="••••••••" autocomplete="off"/><button class="pw-eye" data-t="join-pw"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <button class="btn-main" id="btn-join">Masuk →</button>
+      <div class="err-msg" id="join-err"></div>
     </div>
-    <div class="tab-panel" id="tab-create">
-      <div class="field-group">
-        <label>Nama Room</label>
-        <input id="create-room-name" type="text" placeholder="contoh: rahasia-kita" maxlength="32" autocomplete="off"/>
-        <p class="field-hint">Huruf kecil, angka, tanda hubung saja</p>
-      </div>
-      <div class="field-group">
-        <label>Password</label>
-        <div class="pw-wrap">
-          <input id="create-password" type="password" placeholder="Buat password" autocomplete="off"/>
-          <button class="pw-toggle" data-target="create-password">👁</button>
-        </div>
-      </div>
-      <div class="field-group">
-        <label>Konfirmasi Password</label>
-        <input id="create-password2" type="password" placeholder="Ulangi password" autocomplete="off"/>
-      </div>
-      <div class="expire-info"><span>⏱</span><span>Room otomatis terhapus 24 jam setelah semua orang keluar</span></div>
-      <button class="btn-primary" id="btn-create">Buat Room →</button>
-      <div id="create-error" class="error-msg"></div>
+    <div class="tab-pane" id="tp-create">
+      <div class="field"><label>Nama Room</label><input id="cr-name" type="text" placeholder="contoh: tim-alpha" maxlength="32" autocomplete="off"/><span class="field-hint">Huruf kecil, angka, tanda hubung</span></div>
+      <div class="field"><label>Password</label><div class="pw-row"><input id="cr-pw" type="password" placeholder="Min. 4 karakter" autocomplete="off"/><button class="pw-eye" data-t="cr-pw"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div class="field"><label>Konfirmasi Password</label><input id="cr-pw2" type="password" placeholder="Ulangi password" autocomplete="off"/></div>
+      <div class="expire-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Room terhapus otomatis 24 jam setelah kosong</div>
+      <button class="btn-main" id="btn-create">Buat Room →</button>
+      <div class="err-msg" id="create-err"></div>
     </div>
   </div>
 </div>
 
-<div id="screen-chat" class="screen">
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div id="s-chat" class="screen">
+  <div class="sb-overlay" id="sb-overlay"></div>
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-top">
-      <div class="brand-small">⬡ <span>NEXUS</span></div>
-      <button class="sidebar-close" id="sidebar-close">✕</button>
+    <div class="sb-head">
+      <div class="auth-logo sm"><svg width="20" height="20" viewBox="0 0 36 36" fill="none"><polygon points="18,2 34,11 34,25 18,34 2,25 2,11" stroke="#4f8ef7" stroke-width="2.5" fill="none"/></svg><span class="logo-name">nexus</span></div>
+      <button class="sb-close" id="sb-close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div class="room-info-block">
-      <p class="sidebar-label">ROOM AKTIF</p>
-      <div class="room-name-display"><span>🔒</span><span id="sidebar-room-name">—</span></div>
-      <div class="expire-warning" id="expire-warning" style="display:none">⏱ Terhapus otomatis jika kosong 24 jam</div>
+    <div class="sb-room-block">
+      <div class="sb-section-label">ROOM</div>
+      <div class="sb-room-name"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span id="sb-room-name">—</span></div>
+      <div class="sb-expire hidden" id="sb-expire">⏱ Terhapus otomatis jika kosong 24 jam</div>
     </div>
-    <div class="online-block">
-      <p class="sidebar-label">ONLINE <span id="online-count" class="count-badge">0</span></p>
-      <ul id="online-list"></ul>
+    <div class="sb-online-block">
+      <div class="sb-section-label">ONLINE <span class="online-cnt" id="online-cnt">0</span></div>
+      <ul class="online-list" id="online-list"></ul>
     </div>
-    <div class="sidebar-bottom">
-      <div class="self-info">
-        <span class="dot-green"></span>
-        <span id="chat-username" class="mono-text"></span>
+    <div class="sb-foot">
+      <div class="sb-self"><span class="u-dot"></span><span id="sb-uname" class="mono"></span></div>
+      <div class="sb-actions">
+        <button class="sb-action-btn danger hidden" id="btn-delete-room" title="Hapus room ini"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+        <button class="sb-action-btn" id="btn-leave" title="Keluar room"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
       </div>
-      <button id="btn-leave" class="btn-leave" title="Keluar room">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-      </button>
     </div>
   </aside>
-
   <main class="chat-main">
-    <header class="chat-header">
-      <button class="menu-btn" id="menu-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-      <div class="header-center">
-        <span>🔒</span>
-        <span id="header-room-name" class="room-title">—</span>
-      </div>
-      <div class="header-actions">
-        <button id="btn-loc-header" class="icon-btn" title="Bagikan lokasi">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-        </button>
-        <span id="conn-dot" class="conn-dot connecting"></span>
-      </div>
+    <header class="chat-head">
+      <button class="menu-btn" id="menu-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <div class="head-center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span id="head-room" class="room-title">—</span></div>
+      <div class="head-right"><button class="icon-btn" id="btn-loc-hd" title="Share lokasi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></button><span class="conn-dot" id="conn-dot"></span></div>
     </header>
-
-    <section class="messages-wrap" id="messages-wrap">
-      <div class="messages-list" id="messages-list">
-        <div class="day-sep"><span>Hari ini</span></div>
+    <section class="msgs-wrap" id="msgs-wrap"><div class="msgs-list" id="msgs-list"><div class="day-line"><span>Hari ini</span></div></div></section>
+    <div class="typing-bar" id="typing-bar"><div class="t-dots"><span></span><span></span><span></span></div><span id="typing-txt"></span></div>
+    <footer class="chat-foot">
+      <div class="file-preview hidden" id="file-preview">
+        <div class="fp-inner"><img id="fp-img" src="" alt="" class="hidden"/><div class="fp-file hidden" id="fp-file"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span id="fp-name"></span></div></div>
+        <button class="fp-remove" id="fp-remove">✕</button>
       </div>
-    </section>
-
-    <div class="typing-row" id="typing-row">
-      <div class="typing-dots"><span></span><span></span><span></span></div>
-      <span id="typing-text"></span>
-    </div>
-
-    <footer class="chat-footer">
-      <div class="input-box">
-        <button id="btn-loc" class="loc-btn" title="Bagikan lokasi">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-        </button>
-        <textarea id="msg-input" rows="1" placeholder="Tulis pesan…" maxlength="2000" autocomplete="off"></textarea>
-        <button id="btn-send" class="send-btn">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"/>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-          </svg>
-        </button>
+      <div class="input-row">
+        <label class="attach-btn" for="file-input" title="Kirim file/foto"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></label>
+        <input type="file" id="file-input" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" class="hidden"/>
+        <button class="attach-btn" id="btn-loc" title="Share lokasi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></button>
+        <button class="attach-btn" id="btn-mic" title="Rekam Suara"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></button>
+        <button class="attach-btn" id="btn-secret" title="Mode Pesan Rahasia (Self-Destruct)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+        <textarea id="msg-input" rows="1" placeholder="Tulis pesan..." maxlength="2000" autocomplete="off"></textarea>
+        <button class="send-btn" id="btn-send"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        
+        <div class="record-ui hidden" id="record-ui">
+          <div class="rec-time pulse-red" id="rec-time">00:00</div>
+          <canvas class="rec-canvas" id="rec-canvas"></canvas>
+          <button class="rec-cancel" id="btn-cancel-rec" title="Batal"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button class="rec-send" id="btn-send-rec" title="Kirim"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        </div>
       </div>
-      <p class="footer-hint">Enter kirim · Shift+Enter baris baru</p>
     </footer>
   </main>
 </div>
 
-<!-- Modal keluar -->
-<div class="modal-backdrop" id="leave-modal" style="display:none">
-  <div class="modal-box">
-    <div class="modal-icon">🚪</div>
-    <h3 class="modal-title">Keluar dari room?</h3>
-    <p class="modal-desc">Kamu akan keluar dari <strong id="leave-room-name"></strong>.<br>Jika tidak ada yang tersisa, room terhapus dalam 24 jam.</p>
-    <div class="modal-actions">
-      <button class="btn-cancel" id="btn-cancel-leave">Batal</button>
-      <button class="btn-danger" id="btn-confirm-leave">Ya, Keluar</button>
-    </div>
-  </div>
-</div>
+<div class="modal-bg" id="modal-leave" style="display:none"><div class="modal-box"><div class="modal-icon leave-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div><h3>Keluar dari room?</h3><p>Kamu akan keluar dari <strong id="modal-leave-room"></strong>. Jika kamu terakhir, room terhapus dalam 24 jam.</p><div class="modal-btns"><button class="btn-ghost" id="btn-cancel-leave">Batal</button><button class="btn-main sm" id="btn-confirm-leave">Ya, Keluar</button></div></div></div>
 
-<!-- Modal loading lokasi -->
-<div class="modal-backdrop" id="loc-modal" style="display:none">
-  <div class="modal-box small">
-    <div class="loc-spinner"></div>
-    <p class="modal-desc" style="margin-top:16px;text-align:center">Mengambil lokasi…</p>
-  </div>
-</div>
+<div class="modal-bg" id="modal-delete" style="display:none"><div class="modal-box"><div class="modal-icon delete-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></div><h3>Hapus room ini?</h3><p>Room <strong id="modal-delete-room"></strong> dan <strong>semua pesannya</strong> akan terhapus permanen.</p><div class="modal-btns"><button class="btn-ghost" id="btn-cancel-delete">Batal</button><button class="btn-danger" id="btn-confirm-delete">Hapus Permanen</button></div></div></div>
+
+<div class="modal-bg" id="modal-loc" style="display:none"><div class="modal-box sm"><div class="spinner"></div><p style="margin-top:14px;text-align:center;color:var(--t2)">Mengambil lokasi...</p></div></div>
+
+<div class="upload-toast hidden" id="upload-toast"><div class="ut-bar" id="ut-bar"></div><span id="ut-label">Mengunggah...</span></div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="script.js"></script>

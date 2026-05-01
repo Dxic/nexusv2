@@ -49,13 +49,13 @@ async function handleConnection(io, socket) {
     if (!user) return;
 
     const { username, room } = user;
-    const payload = { ...formatMessage({ username, room, message }), type, meta };
+    const payload = { ...formatMessage({ username, room, message, type, meta }) };
 
     io.to(room).emit('message', payload);
 
-    // Simpan ke DB (lokasi disimpan sebagai teks URL)
+    // Simpan ke DB
     try {
-      await saveMessage({ username, room, message });
+      await saveMessage({ username, room, message, type, meta });
       await touchActivity(room);
     } catch (_) {}
   });
@@ -80,4 +80,4 @@ async function handleConnection(io, socket) {
   });
 }
 
-module.exports = { handleConnection };
+module.exports = { handleConnection, getRoomUsers };

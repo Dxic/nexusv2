@@ -9,6 +9,8 @@ const MessageSchema = new mongoose.Schema({
   username:  { type: String, required: true },
   room:      { type: String, required: true },
   message:   { type: String, required: true, maxlength: 2000 },
+  type:      { type: String, default: 'text' },
+  meta:      { type: mongoose.Schema.Types.Mixed },
   timestamp: { type: Date, default: Date.now }
 });
 

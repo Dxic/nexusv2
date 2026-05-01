@@ -3,8 +3,8 @@
  */
 const Message = require('../models/Message');
 
-async function saveMessage({ username, room, message }) {
-  return Message.create({ username, room, message });
+async function saveMessage({ username, room, message, type = 'text', meta = null }) {
+  return Message.create({ username, room, message, type, meta });
 }
 
 async function getRoomHistory(room, limit = 60) {
@@ -15,8 +15,8 @@ async function getRoomHistory(room, limit = 60) {
   return docs.reverse();
 }
 
-function formatMessage({ username, room, message, timestamp }) {
-  return { username, room, message, timestamp: timestamp || new Date() };
+function formatMessage({ username, room, message, type = 'text', meta = null, timestamp }) {
+  return { username, room, message, type, meta, timestamp: timestamp || new Date() };
 }
 
 module.exports = { saveMessage, getRoomHistory, formatMessage };

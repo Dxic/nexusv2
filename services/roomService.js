@@ -23,7 +23,8 @@ async function createRoom(name, password, createdBy) {
   if (existing) throw new Error('ROOM_EXISTS');
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const room = await Room.create({ name, passwordHash, createdBy, memberCount: 0 });
+  const expiresAt = new Date(Date.now() + EXPIRE_MS);
+  const room = await Room.create({ name, passwordHash, createdBy, memberCount: 0, expiresAt });
   return room;
 }
 
@@ -96,7 +97,20 @@ async function getRoomInfo(name) {
   return Room.findOne({ name }, '-passwordHash').lean();
 }
 
+/**
+ * Delete a room by name, ensuring the requester is the creator.
+ */
+async function deleteRoom(name, username) {
+  const room = await Room.findOne({ name });
+  if (!room) throw new Error('ROOM_NOT_FOUND');
+  if (room.createdBy !== username) throw new Error('NOT_AUTHORIZED');
+
+  await Room.deleteOne({ name });
+  // Optionally clean up messages immediately
+  await Message.deleteMany({ room: name });
+}
+
 module.exports = {
   createRoom, joinRoom, onMemberJoin, onMemberLeave,
-  touchActivity, cleanupOrphanMessages, getRoomInfo
+  touchActivity, cleanupOrphanMessages, getRoomInfo, deleteRoom
 };

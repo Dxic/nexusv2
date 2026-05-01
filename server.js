@@ -4,6 +4,8 @@
  * ============================================================
  */
 
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 require('dotenv').config();
 
 const express   = require('express');
@@ -11,10 +13,13 @@ const http      = require('http');
 const socketIo  = require('socket.io');
 const mongoose  = require('mongoose');
 const path      = require('path');
+const multer    = require('multer');
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 
 const { generateUniqueUsername } = require('./services/usernameService');
-const { createRoom, joinRoom, cleanupOrphanMessages, getRoomInfo } = require('./services/roomService');
-const { handleConnection } = require('./sockets/chatSocket');
+const { createRoom, joinRoom, cleanupOrphanMessages, getRoomInfo, deleteRoom } = require('./services/roomService');
+const { handleConnection, getRoomUsers } = require('./sockets/chatSocket');
 
 const app    = express();
 const server = http.createServer(app);
@@ -45,6 +50,15 @@ mongoose.connect(MONGO_URI)
     console.error('❌ MongoDB:', err.message);
     process.exit(1);
   });
+
+// ── Cloudinary ───────────────────────────────────────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const upload = multer();
 
 // ── REST API ─────────────────────────────────────────────────
 
@@ -92,7 +106,7 @@ app.post('/api/rooms/join', async (req, res) => {
 
   try {
     const room = await joinRoom(name.toLowerCase(), password);
-    res.json({ room: room.name, ok: true });
+    res.json({ room: room.name, createdBy: room.createdBy, ok: true });
   } catch (e) {
     if (e.message === 'ROOM_NOT_FOUND')
       return res.status(404).json({ error: 'Room tidak ditemukan atau sudah expired' });
@@ -107,19 +121,54 @@ app.post('/api/rooms/join', async (req, res) => {
 // Room info
 app.get('/api/rooms/:name/info', async (req, res) => {
   try {
-    const info = await getRoomInfo(req.params.name.toLowerCase());
+    const roomName = req.params.name.toLowerCase();
+    const info = await getRoomInfo(roomName);
 
     if (!info)
       return res.status(404).json({ exists: false });
 
+    // Use live socket users to avoid DB drift ghost counts
+    const liveUsers = getRoomUsers(roomName);
+
     res.json({
       exists: true,
       name: info.name,
-      members: info.memberCount
+      members: liveUsers.length
     });
   } catch {
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+// Delete room (only creator)
+app.delete('/api/rooms/:name', async (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ error: 'Username required' });
+
+  try {
+    await deleteRoom(req.params.name.toLowerCase(), username);
+    io.to(req.params.name.toLowerCase()).emit('roomDeleted');
+    res.json({ ok: true });
+  } catch (e) {
+    if (e.message === 'ROOM_NOT_FOUND') return res.status(404).json({ error: 'Room not found' });
+    if (e.message === 'NOT_AUTHORIZED') return res.status(403).json({ error: 'Not authorized' });
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Upload image/file
+app.post('/api/upload', upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+  const stream = cloudinary.uploader.upload_stream(
+    { resource_type: 'auto' },
+    (error, result) => {
+      if (error) return res.status(500).json({ error: 'Upload failed' });
+      res.json({ url: result.secure_url });
+    }
+  );
+
+  streamifier.createReadStream(req.file.buffer).pipe(stream);
 });
 
 // ── Socket ───────────────────────────────────────────────────
