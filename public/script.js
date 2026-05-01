@@ -263,6 +263,12 @@
     if (fpImg.src) { URL.revokeObjectURL(fpImg.src); fpImg.src = ''; }
   });
 
+  function clearFilePreview() {
+    pendingFile = null; fileInput.value = '';
+    filePreview.classList.add('hidden');
+    if (fpImg.src) { URL.revokeObjectURL(fpImg.src); fpImg.src = ''; }
+  }
+
   /* ── Voice Notes ── */
   btnMic.addEventListener('click', startRecording);
   btnCancelRec.addEventListener('click', () => stopRecording(false));
