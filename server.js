@@ -147,7 +147,7 @@ app.delete('/api/rooms/:name', async (req, res) => {
 
   try {
     await deleteRoom(req.params.name.toLowerCase(), username);
-    io.to(req.params.name.toLowerCase()).emit('roomDeleted');
+    io.to(req.params.name.toLowerCase()).emit('roomDeleted', { message: 'Room ini telah dihapus oleh pembuatnya.' });
     res.json({ ok: true });
   } catch (e) {
     if (e.message === 'ROOM_NOT_FOUND') return res.status(404).json({ error: 'Room not found' });

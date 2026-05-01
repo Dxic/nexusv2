@@ -3,7 +3,7 @@
  * Integrates with roomService for member tracking and expiry.
  */
 const { saveMessage, getRoomHistory, formatMessage } = require('../services/chatService');
-const { onMemberJoin, onMemberLeave, touchActivity }  = require('../services/roomService');
+const { onMemberJoin, onMemberLeave, touchActivity, deleteRoom }  = require('../services/roomService');
 
 // socketId → { username, room }
 const onlineUsers = new Map();
@@ -65,6 +65,19 @@ async function handleConnection(io, socket) {
     const user = onlineUsers.get(socket.id);
     if (!user) return;
     socket.to(user.room).emit('typing', { username: user.username, isTyping });
+  });
+
+  // ── DELETE ROOM (Creator only) ────────────────────────────────
+  socket.on('deleteRoom', async ({ room }) => {
+    const user = onlineUsers.get(socket.id);
+    if (!user || user.room !== room) return;
+
+    try {
+      await deleteRoom(room, user.username);
+      io.to(room).emit('roomDeleted', { message: 'Room ini telah dihapus oleh pembuatnya.' });
+    } catch (e) {
+      socket.emit('error', { message: 'Gagal menghapus room: ' + e.message });
+    }
   });
 
   // ── DISCONNECT ────────────────────────────────────────────────
