@@ -1,13 +1,3 @@
-/**
- * Room Service — Business Logic
- * Handles: create room, verify password, member tracking, expiry scheduling
- *
- * Expiry logic:
- *  - When last member leaves → set expiresAt = now + 24h
- *  - MongoDB TTL index auto-deletes the Room document after expiresAt
- *  - A cleanup job also deletes orphan messages for that room
- *  - When a new member joins → clear expiresAt (room is alive again)
- */
 const bcrypt  = require('bcryptjs');
 const Room    = require('../models/Room');
 const Message = require('../models/Message');
