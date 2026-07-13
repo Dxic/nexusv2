@@ -1,8 +1,3 @@
-/**
- * Message Model
- * Messages are also cleaned up when the room is deleted.
- * A cleanup job in roomService handles orphan messages.
- */
 const mongoose = require('mongoose');
 
 const MessageSchema = new mongoose.Schema({
