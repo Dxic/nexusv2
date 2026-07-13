@@ -1,9 +1,3 @@
-/**
- * ============================================================
- * NEXUS CHAT v2 — SERVER (FINAL PRODUCTION)
- * ============================================================
- */
-
 const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 require('dotenv').config();
@@ -178,7 +172,7 @@ io.on('connection', (socket) => handleConnection(io, socket));
 setInterval(async () => {
   try {
     const n = await cleanupOrphanMessages();
-    if (n > 0) console.log(`🧹 Cleaned ${n} orphan messages`);
+    if (n > 0) console.log(` Cleaned ${n} orphan messages`);
   } catch (err) {
     console.log('Cleanup error:', err.message);
   }
@@ -188,5 +182,5 @@ setInterval(async () => {
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-  console.log(`🚀 Nexus Chat v2 running on port ${PORT}`);
+  console.log(` Nexus Chat v2 running on port ${PORT}`);
 });
