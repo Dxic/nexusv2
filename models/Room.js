@@ -1,8 +1,3 @@
-/**
- * Room Model
- * - Stores room metadata: name, hashed password, last activity
- * - Auto-delete trigger: if lastActivity > 24h and memberCount = 0
- */
 const mongoose = require('mongoose');
 
 const RoomSchema = new mongoose.Schema({
